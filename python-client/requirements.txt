@@ -2,3 +2,5 @@ rsocket[reactivex]
 rx
 asyncio
 busypie
+protobuf
+pure_protobuf

@@ -6,6 +6,7 @@ from rsocket.transports.tcp import TransportTCP
 from rsocket.helpers import single_transport_provider
 
 from client import SolaceClient
+from example import SearchRequest
 
 
 async def main():
@@ -16,6 +17,13 @@ async def main():
         await sol_client.send_string('send/topic/a', 'Fire Hello')
         await sol_client.subscribe_string('receive/topic/b', 3)
         await sol_client.unsubscribe()
+
+        req = SearchRequest()
+        req.query = 'Query'
+        req.page_number = 42
+        req.result_per_page = 10
+
+        await sol_client.send_bytes('send/topic/bytes', req.dumps())
 
 
 if __name__ == '__main__':

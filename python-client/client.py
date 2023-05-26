@@ -1,4 +1,5 @@
 import json
+import base64
 
 from reactivestreams.subscriber import DefaultSubscriber
 from reactivestreams.subscription import Subscription
@@ -19,7 +20,12 @@ class SolaceClient:
     async def send_string(self, topic: str, data: str):
         json_data = _serialize({'topic': topic, 'data': data})
         payload = Payload(json_data, composite(route('send.string')))
+        await self._rsocket.fire_and_forget(payload)
 
+    async def send_bytes(self, topic: str, data: bytes):
+        base64_data = base64.b64encode(data)
+        json_data = _serialize({'topic': topic, 'encodedData': utf8_decode(base64_data)})
+        payload = Payload(json_data, composite(route('send.bytes')))
         await self._rsocket.fire_and_forget(payload)
 
     async def subscribe_string(self, topic: str, count: int):
