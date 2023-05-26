@@ -7,6 +7,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 
+import java.util.Base64;
+
 @Slf4j
 @Controller
 public class DemoController {
@@ -33,6 +35,15 @@ public class DemoController {
     public Flux<String> subscribeString(String topic) {
         log.info("Subscribing to topic: " + topic);
         return Flux.just("First", "Second", "Third");
+    }
+
+    @MessageMapping("subscribe.bytes")
+    public Flux<String> subscribeBytes(String topic) {
+        log.info("Subscribing to topic: " + topic);
+        var searchRequest = Example.SearchRequest.newBuilder().setQuery("Hello!").build();
+        var bytes = searchRequest.toByteArray();
+        var base64 = Base64.getEncoder().encodeToString(bytes);
+        return Flux.just(base64);
     }
 
     @MessageMapping("unsubscribe")

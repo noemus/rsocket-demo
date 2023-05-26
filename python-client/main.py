@@ -24,6 +24,7 @@ async def main():
         req.result_per_page = 10
 
         await sol_client.send_bytes('send/topic/bytes', req.dumps())
+        await sol_client.subscribe_bytes('subscribe/topic/bytes', 1)
 
 
 if __name__ == '__main__':

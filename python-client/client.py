@@ -12,6 +12,8 @@ from rsocket.rx_support.rx_rsocket import RxRSocket
 
 from rx import operators
 
+from example import SearchRequest
+
 
 class SolaceClient:
     def __init__(self, rsocket: RSocketClient):
@@ -35,6 +37,16 @@ class SolaceClient:
             operators.map(lambda _: _.data),
             operators.map(lambda _: utf8_decode(_)),
             operators.do_action(lambda _: print(f'Data: {_}'))
+        )
+
+    async def subscribe_bytes(self, topic: str, count: int):
+        payload = Payload(ensure_bytes(topic), composite(route('subscribe.bytes')))
+        rx_client = RxRSocket(self._rsocket)
+        await rx_client.request_stream(payload, count).pipe(
+            operators.map(lambda _: _.data),
+            operators.map(lambda _: base64.b64decode(_)),
+            operators.map(lambda _: SearchRequest.serializer.loads(_)),
+            operators.do_action(lambda _: print(f'SearchRequest: {_}'))
         )
 
     async def unsubscribe(self):
